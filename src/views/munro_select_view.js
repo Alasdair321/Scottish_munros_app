@@ -8,15 +8,23 @@ const MunroSelector = function (dropDown) {
 MunroSelector.prototype.bindEvents = function () {
   PubSub.subscribe('Munro:ReadyforDropdown', (event) => {
     // this.munros = event.detail;
-    console.log(event.detail);
-    // this.render();
+    // console.log(event.detail);
+    this.render(event.detail);
   })
+  this.dropDown.addEventListener('change', (event)=>{
+    const selected = event.target.value;
+    PubSub.publish('Select:region-selected', selected);
+  })
+
 };
 
-MunroSelector.prototype.render = function () {
-  // for each unique region add option to select
-
-
+MunroSelector.prototype.render = function (options) {
+  options.forEach((option, index)=>{
+    const selectOption = document.createElement('option');
+    selectOption.textContent = option;
+    selectOption.value = option;
+    this.dropDown.appendChild(selectOption);
+  })
 };
 
 module.exports = MunroSelector;

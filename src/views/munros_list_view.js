@@ -10,12 +10,25 @@ MunroListView.prototype.bindEvents = function () {
     this.munros = event.detail;
     this.render();
   })
+  PubSub.subscribe('Select:region-selected', (event)=>{
+    const selectedRegion = event.detail;
+    this.renderRegion(selectedRegion);
+  })
 };
 
 MunroListView.prototype.render = function () {
   this.munros.forEach( ( munro ) => {
     const munroView = new MunroView(this.container, munro)
     munroView.render();
+  });
+};
+
+MunroListView.prototype.renderRegion = function (region) {
+  this.munros.forEach( ( munro ) => {
+    if (region === munro.region) {
+      const munroView = new MunroView(this.container, munro)
+      munroView.render();
+    }
   });
 };
 
