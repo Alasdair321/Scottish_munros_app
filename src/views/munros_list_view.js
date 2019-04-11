@@ -6,10 +6,17 @@ const MunroListView = function (container) {
 }
 
 MunroListView.prototype.bindEvents = function () {
-  PubSub.subscribe('Munro:Ready', (event)=>{
-    console.log(event);
+  PubSub.subscribe('Munro:Ready', (event) => {
+    this.munros = event.detail;
+    this.render();
   })
+};
 
+MunroListView.prototype.render = function () {
+  this.munros.forEach( ( munro ) => {
+    const munroView = new MunroView(this.container, munro)
+    munroView.render();
+  });
 };
 
 module.exports = MunroListView;

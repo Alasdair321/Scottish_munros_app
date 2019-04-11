@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const munroListView = new MunroListView(container);
   munroListView.bindEvents();
 
-  const munros = new Munros();
+  const munros = new Munro();
   munros.getData();
 
 });

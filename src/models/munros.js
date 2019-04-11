@@ -7,15 +7,15 @@ const Munros = function () {
 
 Munros.prototype.getData = function () {
   const requestHelper = new RequestHelper('https://munroapi.herokuapp.com/munros');
-  requestHelper.get((data)=>{
-    .then((data) => {
+  requestHelper.get()
+    .then( (data) => {
       this.munros = data;
-      PubSub.publish('Munro:Ready', this.data);
+      console.log(this.munros);
+      PubSub.publish('Munro:Ready', this.munros);
     })
-    .catch((err) => {
+    .catch( (err) => {
       PubSub.publish('Munro:error', err);
     });
-  })
-};
+  };
 
 module.exports = Munros;

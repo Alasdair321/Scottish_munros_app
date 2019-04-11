@@ -78,7 +78,7 @@
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-eval("const MunroListView = __webpack_require__(/*! ./views/munros_list_view.js */ \"./src/views/munros_list_view.js\");\nconst Munro = __webpack_require__(/*! ./models/munros.js */ \"./src/models/munros.js\");\n\n\ndocument.addEventListener('DOMContentLoaded', () => {\n  console.log('JavaScript Loaded');\n\n  const container = document.querySelector('#munros-container');\n  const munroListView = new MunroListView(container);\n  munroListView.bindEvents();\n\n  const munros = new Munros();\n  munros.getData();\n\n});\n\n\n//# sourceURL=webpack:///./src/app.js?");
+eval("const MunroListView = __webpack_require__(/*! ./views/munros_list_view.js */ \"./src/views/munros_list_view.js\");\nconst Munro = __webpack_require__(/*! ./models/munros.js */ \"./src/models/munros.js\");\n\n\ndocument.addEventListener('DOMContentLoaded', () => {\n  console.log('JavaScript Loaded');\n\n  const container = document.querySelector('#munros-container');\n  const munroListView = new MunroListView(container);\n  munroListView.bindEvents();\n\n  const munros = new Munro();\n  munros.getData();\n\n});\n\n\n//# sourceURL=webpack:///./src/app.js?");
 
 /***/ }),
 
@@ -93,14 +93,25 @@ eval("const PubSub = {\n  publish: function (channel, payload) {\n    const even
 
 /***/ }),
 
+/***/ "./src/helpers/request_helper.js":
+/*!***************************************!*\
+  !*** ./src/helpers/request_helper.js ***!
+  \***************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+eval("const RequestHelper = function (url) {\n  this.url = url\n}\n\nRequestHelper.prototype.get = function () {\n  return fetch(this.url)\n    .then(response => response.json());\n};\n\nmodule.exports = RequestHelper;\n\n\n//# sourceURL=webpack:///./src/helpers/request_helper.js?");
+
+/***/ }),
+
 /***/ "./src/models/munros.js":
 /*!******************************!*\
   !*** ./src/models/munros.js ***!
   \******************************/
 /*! no static exports found */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-eval("throw new Error(\"Module parse failed: Unexpected token (11:4)\\nYou may need an appropriate loader to handle this file type.\\n|   const requestHelper = new RequestHelper('https://munroapi.herokuapp.com/munros');\\n|   requestHelper.get((data)=>{\\n|     .then((data) => {\\n|       this.munros = data;\\n|       PubSub.publish('Munro:Ready', this.data);\");\n\n//# sourceURL=webpack:///./src/models/munros.js?");
+eval("const PubSub = __webpack_require__(/*! ../helpers/pub_sub.js */ \"./src/helpers/pub_sub.js\");\nconst RequestHelper = __webpack_require__(/*! ../helpers/request_helper.js */ \"./src/helpers/request_helper.js\");\n\nconst Munros = function () {\n  this.munros = [];\n};\n\nMunros.prototype.getData = function () {\n  const requestHelper = new RequestHelper('https://munroapi.herokuapp.com/munros');\n  requestHelper.get()\n    .then( (data) => {\n      this.munros = data;\n      console.log(this.munros);\n      PubSub.publish('Munro:Ready', this.munros);\n    })\n    .catch( (err) => {\n      PubSub.publish('Munro:error', err);\n    });\n  };\n\nmodule.exports = Munros;\n\n\n//# sourceURL=webpack:///./src/models/munros.js?");
 
 /***/ }),
 
@@ -111,7 +122,7 @@ eval("throw new Error(\"Module parse failed: Unexpected token (11:4)\\nYou may n
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-eval("\n\n//# sourceURL=webpack:///./src/views/munro_view.js?");
+eval("const MunroView = function(container, munro) {\nthis.container = container;\nthis.munro = munro;\n};\n\nMunroView.prototype.render = function () {\n  const munroContainer = document.createElement('div');\n  munroContainer.classList.add('mountain');\n\n  const heading = document.createElement('h1');\n  heading.classList.add('munro-name');\n  heading.textContent = `Munro: ${this.munro.name}`\n  this.container.appendChild(munroContainer);\n  munroContainer.appendChild(heading);\n};\n\nmodule.exports = MunroView;\n\n\n//# sourceURL=webpack:///./src/views/munro_view.js?");
 
 /***/ }),
 
@@ -122,7 +133,7 @@ eval("\n\n//# sourceURL=webpack:///./src/views/munro_view.js?");
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-eval("const PubSub = __webpack_require__(/*! ../helpers/pub_sub.js */ \"./src/helpers/pub_sub.js\");\nconst MunroView = __webpack_require__(/*! ./munro_view.js */ \"./src/views/munro_view.js\");\n\nconst MunroListView = function (container) {\n  this.container = container;\n}\n\nMunroListView.prototype.bindEvents = function () {\n  PubSub.subscribe('Munro:Ready', (event)=>{\n    console.log(event);\n  })\n\n};\n\nmodule.exports = MunroListView;\n\n\n//# sourceURL=webpack:///./src/views/munros_list_view.js?");
+eval("const PubSub = __webpack_require__(/*! ../helpers/pub_sub.js */ \"./src/helpers/pub_sub.js\");\nconst MunroView = __webpack_require__(/*! ./munro_view.js */ \"./src/views/munro_view.js\");\n\nconst MunroListView = function (container) {\n  this.container = container;\n}\n\nMunroListView.prototype.bindEvents = function () {\n  PubSub.subscribe('Munro:Ready', (event) => {\n    this.munros = event.detail;\n    this.render();\n  })\n};\n\nMunroListView.prototype.render = function () {\n  this.munros.forEach( ( munro ) => {\n    const munroView = new MunroView(this.container, munro)\n    munroView.render();\n  });\n};\n\nmodule.exports = MunroListView;\n\n\n//# sourceURL=webpack:///./src/views/munros_list_view.js?");
 
 /***/ })
 
